@@ -6,6 +6,30 @@ A comprehensive KDE Plasma widget for controlling ASUS TUF series laptops, provi
 ![License](https://img.shields.io/badge/license-GPL--2.0+-green)
 ![KDE](https://img.shields.io/badge/KDE%20Plasma-6.0+-blue)
 
+## 📸 Screenshots
+
+### Main Widget Interface
+![Main Widget](git_imgs/main_ui.png)
+
+*Main widget showing power profiles, GPU mode, and system monitoring*
+
+### Compact Panel View
+![Panel Icon](git_imgs/mini.png)
+
+*Compact widget icon in the system panel - changes based on current GPU mode*
+
+### Advanced Hardware Controls
+![Advanced Controls](git_imgs/cpu_control.png)
+*Advanced controls window with CPU power limits, keyboard lighting, and detailed settings*
+
+
+### Keyboard Lighting
+![RGB Controls](git_imgs/aura.png)
+
+*Full keyboard lighting control with modes and bios settings*
+
+
+
 ## 🚀 Quick Setup
 
 **TL;DR**: Download and run the install script:
@@ -36,16 +60,17 @@ Then add the widget to your panel: Right-click panel → Add Widgets → Search 
   - Per-state power control (Boot, Awake, Sleep, Shutdown)
   - Brightness adjustment (0-3 levels)
   - Custom RGB color settings
-- **Display Settings**: Panel overdrive toggle
+- **Display Settings**: Panel overdrive toggle and refresh rate control
+- **Auto Display Mode**: Automatic display optimization based on power status
 - **System Monitoring**: Real-time CPU/GPU temperatures and fan speeds
 - **Service Status**: Monitor asusctl, supergfxd, and nvidia-powerd services
 
-### Hardware Support
-- **CPU**: Intel and AMD processors with power limit controls
-- **GPU**: NVIDIA/AMD dedicated GPU switching
-- **Cooling**: Fan speed monitoring and thermal management
-- **Display**: Refresh rate control and panel overdrive
-- **Keyboard**: Full RGB backlight control via ASUS Aura
+### User Interface Features
+- **Dynamic Panel Icon**: Changes based on current GPU mode
+- **Optimistic UI Updates**: Instant visual feedback while commands execute
+- **Intelligent Command Queuing**: Handle multiple rapid clicks gracefully
+- **Auto-revert on Failure**: UI automatically reverts if commands fail
+- **Real-time Status Updates**: Live monitoring of system state
 
 ## 🚀 Installation
 
@@ -262,16 +287,40 @@ sudo udevadm control --reload-rules
 # Note: System services (asusd, supergfxd) are left running as they may be used by other applications
 ```
 
+## 🖼️ Widget Preview
+
+### Main Interface States
+
+| Power Mode | GPU Mode | Panel Icon | Description |
+|------------|----------|------------|-------------|
+| Silent | Integrated | ![iGPU Icon](screenshots/icons/egpu-mode.png) | Power-saving mode with integrated graphics |
+| Balanced | Hybrid | ![Hybrid Icon](screenshots/icons/hgpu-mode.png) | Balanced performance with hybrid graphics |
+| Performance | Dedicated | ![dGPU Icon](screenshots/icons/dgpu-mode.png) | Maximum performance with dedicated GPU |
+
+### Advanced Controls Layout
+
+![Advanced Layout](screenshots/advanced-layout-diagram.png)
+*Advanced controls window layout showing all available hardware controls*
+
 ## 🎮 Usage
 
 ### Main Interface
 - **Power Profile Buttons**: Quick switching between Silent/Balanced/Performance
 - **GPU Mode Toggle**: Switch between Integrated/Hybrid/Dedicated graphics
 - **Battery Slider**: Adjust charge limit from 50% to 100%
+- **System Monitoring**: View real-time CPU temperature and fan speeds
 - **Advanced Controls**: Access detailed power and lighting controls
 
+### Widget Behavior
+- **Panel Icon**: Dynamically changes to show current GPU mode
+  - 🔋 Green icon = Integrated GPU (power saving)
+  - ⚡ Yellow icon = Hybrid mode (balanced)
+  - 🎮 Red icon = Dedicated GPU (performance)
+- **Visual Feedback**: Buttons highlight when active, disable when unavailable
+- **Status Updates**: Real-time updates every 3 seconds, immediate on changes
+
 ### Advanced Controls Window
-Access via the gear icon for:
+Access via the "Advanced HW Controls" button for:
 
 #### CPU Controls
 - **Turbo Boost Toggle**: Enable/disable CPU boost
@@ -289,7 +338,8 @@ Access via the gear icon for:
 
 #### Display Settings
 - **Panel Overdrive**: Toggle high refresh rate display overdrive
-- **Refresh Rate**: Monitor current display refresh rate
+- **Refresh Rate**: Monitor and control current display refresh rate
+- **Auto Display Mode**: Automatic optimization based on power status
 
 ### Command Line Interface
 
@@ -307,83 +357,23 @@ python3 ~/.local/share/plasma/plasmoids/org.kde.plasma.asustufcontrol/contents/s
 python3 ~/.local/share/plasma/plasmoids/org.kde.plasma.asustufcontrol/contents/scripts/helper.py charge 80
 ```
 
-## 🔧 Configuration
-
-### Debug Mode
-
-1. Check logs: `journalctl -f | grep asustufcontrol`
-
-### Custom Power Limits
-Adjust power limit ranges in `helper.py`:
-```python
-self.min_power_limit = 10  # Minimum watts
-self.max_power_limit = 95  # Maximum watts
-```
-
-### Service Monitoring
-The widget monitors these system services:
-- `asusd` - Main ASUS control daemon
-- `supergfxd` - GPU switching daemon  
-- `nvidia-powerd` - NVIDIA power management
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **"Failed to connect to ASUS lighting service"**
-   - Ensure `asusd` is running: `systemctl status asusd`
-   - Check D-Bus service: `busctl list | grep ljones`
-
-2. **Permission denied errors**
-   - Verify polkit rules are correctly configured
-   - Check sudo access for helper script
-   - Ensure user is in `wheel` group
-
-3. **GPU switching not working**
-   - Install and enable `supergfxd`: `systemctl enable --now supergfxd`
-   - Check GPU status: `supergfxctl -s`
-
-4. **Battery charge limit not working**
-   - Verify udev rules are applied
-   - Check file permissions: `ls -l /sys/class/power_supply/BAT*/charge_control_end_threshold`
-
-5. **Power limits not applying**
-   - For Intel: Check RAPL availability: `ls /sys/class/powercap/intel-rapl*`
-   - For AMD: Install `ryzenadj` package
-
-6. **Issues on gaming distros (Garuda, CachyOS)**
-   - Ensure kernel headers are installed: `sudo pacman -S linux-headers`
-   - For Bore kernel users: `sudo pacman -S linux-bore-headers`
-   - Check if gaming optimizations conflict: temporarily disable custom governors
-
-### Logs and Debugging
-
-```bash
-# Check widget logs
-journalctl -f | grep plasma
-
-# Check D-Bus services
-busctl list | grep -E "(asus|Asusd)"
-
-# Test keyboard lighting manually
-python3 /path/to/asus_keyboard_lighting_control.py status
-
-# Test system controls
-python3 /path/to/helper.py status
-```
-
 ## 📋 Supported Hardware
 
 ### Tested Models
 - ASUS TUF Gaming F15 series
 - ASUS TUF Gaming A15 series
 - ASUS TUF Gaming F17 series
+- ASUS ROG Strix series (partial support)
 
-### Tested Distributions
-- **Arch Linux** - Official packages and AUR
-- **Garuda Linux** - Arch-based gaming distro with performance optimizations
-- **CachyOS** - Arch-based with Bore kernel for enhanced gaming performance
+### Hardware Requirements
 
+| Component | Requirement | Notes |
+|-----------|------------|-------|
+| **CPU** | Intel/AMD with power controls | RAPL support for Intel, ryzenadj for AMD |
+| **GPU** | NVIDIA/AMD with MUX switch | Hybrid graphics support required |
+| **Display** | Variable refresh rate panel | Optional for display controls |
+| **Keyboard** | ASUS Aura RGB backlight | Optional for lighting controls |
+| **Battery** | ASUS charge limit support | Required for battery management |
 
 ### Kernel Compatibility
 - **Standard Linux kernels** (5.15+)
