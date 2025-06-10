@@ -748,40 +748,102 @@ def get_charging_type():
 def get_battery_charging_status():
     """Get actual battery charging status independent of ASUS charge modes"""
     try:
+        # Get current charge limit to properly determine if battery is "full"
+        charge_limit = 100  # Default charge limit
+        for bat_num in ['BAT0', 'BAT1']:
+            charge_limit_path = f'/sys/class/power_supply/{bat_num}/charge_control_end_threshold'
+            if os.path.exists(charge_limit_path):
+                try:
+                    with open(charge_limit_path, 'r') as f:
+                        charge_limit = int(f.read().strip())
+                    break  # Use the first available charge limit
+                except:
+                    continue
+        
         # Check BAT0 and BAT1 for battery status
         for bat in ['BAT0', 'BAT1']:
             battery_path = f'/sys/class/power_supply/{bat}'
             if os.path.exists(battery_path):
                 status_path = os.path.join(battery_path, 'status')
+                capacity_path = os.path.join(battery_path, 'capacity')
+                
                 if os.path.exists(status_path):
                     with open(status_path, 'r') as f:
                         status = f.read().strip().upper()
+                    
+                    # Get current battery capacity
+                    capacity = 0
+                    if os.path.exists(capacity_path):
+                        try:
+                            with open(capacity_path, 'r') as f:
+                                capacity = int(f.read().strip())
+                        except:
+                            capacity = 0
                         
-                        # Map battery status to our codes
-                        if status == 'DISCHARGING':
-                            return "0"
-                        elif status == 'CHARGING':
-                            # Get charging type for more detail
-                            charging_type = get_charging_type()
-                            if charging_type == "USB_PD":
-                                return "2"  # Type-C charging
-                            else:
-                                return "1"  # AC charging
-                        elif status == 'FULL':
-                            return "3"  # Fully charged
-                        elif status == 'NOT_CHARGING':
-                            # Check if plugged in but not charging due to charge limit
-                            capacity_path = os.path.join(battery_path, 'capacity')
-                            if os.path.exists(capacity_path):
-                                with open(capacity_path, 'r') as f:
-                                    capacity = int(f.read().strip())
-                                    if capacity >= 95:  # Nearly full
-                                        return "3"  # Consider as fully charged
-                                    else:
-                                        return "4"  # Plugged in but not charging
-                            return "4"
+                    # Map battery status to our codes
+                    if status == 'DISCHARGING':
+                        # Check if battery is actually at charge limit and should be considered "full"
+                        # even when showing as discharging (common when charge limit < 100%)
+                        if capacity >= charge_limit - 2:  # Allow 2% tolerance for charge limit
+                            # Check if power supply is connected (AC adapter plugged in)
+                            # Look for any online power supply
+                            power_connected = False
+                            try:
+                                power_supply_path = '/sys/class/power_supply'
+                                if os.path.exists(power_supply_path):
+                                    for ps in os.listdir(power_supply_path):
+                                        ps_path = os.path.join(power_supply_path, ps)
+                                        online_path = os.path.join(ps_path, 'online')
+                                        if os.path.exists(online_path):
+                                            with open(online_path, 'r') as f:
+                                                if f.read().strip() == '1':
+                                                    power_connected = True
+                                                    break
+                            except:
+                                pass
+                            
+                            if power_connected:
+                                return "3"  # Fully charged (at charge limit with power connected)
+                        
+                        return "0"  # Actually discharging
+                    elif status == 'CHARGING':
+                        # Get charging type for more detail
+                        charging_type = get_charging_type()
+                        if charging_type == "USB_PD":
+                            return "2"  # Type-C charging
                         else:
-                            return "0"  # Unknown, assume discharging
+                            return "1"  # AC charging
+                    elif status == 'FULL':
+                        return "3"  # Fully charged
+                    elif status == 'NOT_CHARGING':
+                        # Check if plugged in but not charging due to charge limit
+                        if capacity >= charge_limit - 2:  # At or near charge limit (2% tolerance)
+                            return "3"  # Consider as fully charged
+                        else:
+                            return "4"  # Plugged in but not charging
+                    else:
+                        # Unknown status, check if we're at charge limit with power connected
+                        if capacity >= charge_limit - 2:
+                            # Check if power supply is connected
+                            power_connected = False
+                            try:
+                                power_supply_path = '/sys/class/power_supply'
+                                if os.path.exists(power_supply_path):
+                                    for ps in os.listdir(power_supply_path):
+                                        ps_path = os.path.join(power_supply_path, ps)
+                                        online_path = os.path.join(ps_path, 'online')
+                                        if os.path.exists(online_path):
+                                            with open(online_path, 'r') as f:
+                                                if f.read().strip() == '1':
+                                                    power_connected = True
+                                                    break
+                            except:
+                                pass
+                            
+                            if power_connected:
+                                return "3"  # Fully charged (at charge limit)
+                        
+                        return "0"  # Unknown, assume discharging
         
         # If no battery found, return unknown
         return "0"
@@ -1553,6 +1615,29 @@ def detect_dgpu():
         return "none"
 
 
+def get_charge_limit():
+    """Get the current battery charge limit"""
+    try:
+        # Check both BAT0 and BAT1 for charge limit
+        for bat in ['BAT0', 'BAT1']:
+            charge_limit_path = f'/sys/class/power_supply/{bat}/charge_control_end_threshold'
+            if os.path.exists(charge_limit_path):
+                try:
+                    with open(charge_limit_path, 'r') as f:
+                        limit = int(f.read().strip())
+                        if 50 <= limit <= 100:  # Validate reasonable range
+                            return str(limit)
+                except:
+                    continue
+        
+        # If no valid charge limit found, return default
+        return "100"
+    except Exception as e:
+        if DEBUG_MODE:
+            logging.debug(f"Error getting charge limit: {e}")
+        return "100"
+
+
 if __name__ == '__main__':
     try:
         # Setup signal handlers for proper cleanup
@@ -1687,6 +1772,11 @@ if __name__ == '__main__':
                     sys.exit(0)
                 else:
                     sys.exit(1)
+            elif command == 'get-charge-limit':
+                # Get current charge limit
+                limit = get_charge_limit()
+                print(limit)
+                sys.exit(0)
             else:
                 if DEBUG_MODE:
                     logging.debug(f"Unknown command or missing arguments: {command}")

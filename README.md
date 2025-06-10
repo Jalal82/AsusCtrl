@@ -108,12 +108,10 @@ The script will automatically:
 - ✅ Restart Plasma shell to load the widget
 
 **Supported Distributions:**
-- Arch Linux (pacman + AUR)
-- Garuda Linux (Arch-based with gaming optimizations)
-- CachyOS (Arch-based with Bore kernel support)
-- Ubuntu/Debian (apt)
-- Fedora (dnf)
-- openSUSE (zypper)
+- Arch Linux (pacman + AUR) (tested)
+- Garuda Linux (Arch-based with gaming optimizations) (tested)
+- CachyOS (Arch-based with Bore kernel support) (tested)
+
 
 ### Option 2: Manual Installation
 
