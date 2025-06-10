@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# ASUS TUF Control - KDE Plasma Widget Installation Script
-# This script automates the installation process for the ASUS TUF Control widget
+# AsusCtrl - KDE Plasma Widget Installation Script
+# This script automates the installation process for the AsusCtrl widget
 
 set -e  # Exit on any error
 
@@ -104,7 +104,7 @@ check_wheel_group() {
 # Main installation function
 main() {
     echo "========================================"
-    echo "  ASUS TUF Control Widget Installer"
+    echo "  AsusCtrl Widget Installer"
     echo "========================================"
     echo ""
     
@@ -239,7 +239,7 @@ main() {
     print_status "Creating polkit rules..."
     
     sudo tee "$POLKIT_RULES" > /dev/null << EOF
-// ASUS TUF Control Widget - Polkit Rules
+// AsusCtrl Widget - Polkit Rules
 polkit.addRule(function(action, subject) {
     if ((action.id == "org.freedesktop.policykit.exec" &&
          action.lookup("program") == "/usr/bin/python3" &&
@@ -264,7 +264,7 @@ EOF
     print_status "Creating sudoers configuration..."
     
     sudo tee "$SUDOERS_FILE" > /dev/null << EOF
-# ASUS TUF Control Widget - Sudo Rules
+# AsusCtrl Widget - Sudo Rules
 $USER ALL=(ALL) NOPASSWD: /usr/bin/python3 $WIDGET_DIR/$WIDGET_NAME/contents/scripts/helper.py *
 $USER ALL=(ALL) NOPASSWD: /bin/systemctl enable nvidia-powerd.service
 $USER ALL=(ALL) NOPASSWD: /bin/systemctl disable nvidia-powerd.service
@@ -279,7 +279,7 @@ EOF
     print_status "Creating udev rules for battery charge limit..."
     
     sudo tee "$UDEV_RULES" > /dev/null << 'EOF'
-# ASUS TUF Control Widget - Battery Charge Limit Rules
+# AsusCtrl Widget - Battery Charge Limit Rules
 ACTION=="add", SUBSYSTEM=="power_supply", ATTR{name}=="BAT0", RUN+="/bin/chmod a+w /sys/class/power_supply/BAT0/charge_control_end_threshold"
 ACTION=="add", SUBSYSTEM=="power_supply", ATTR{name}=="BAT1", RUN+="/bin/chmod a+w /sys/class/power_supply/BAT1/charge_control_end_threshold"
 EOF
@@ -340,7 +340,7 @@ EOF
     print_status "Next steps:"
     echo "1. Right-click on your KDE Plasma panel"
     echo "2. Select 'Add Widgets...'"
-    echo "3. Search for 'ASUS TUF Control'"
+    echo "3. Search for 'AsusCtrl'"
     echo "4. Drag the widget to your panel or desktop"
     echo ""
     print_status "If the widget doesn't appear immediately:"

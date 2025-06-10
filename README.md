@@ -1,4 +1,4 @@
-# ASUS TUF Control - KDE Plasma Widget
+# AsusCtrl - KDE Plasma Widget
 
 A comprehensive KDE Plasma widget for controlling ASUS TUF series laptops, providing easy access to power management, GPU switching, thermal controls, keyboard lighting, and system monitoring.
 
@@ -17,7 +17,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-Then add the widget to your panel: Right-click panel → Add Widgets → Search "ASUS TUF Control"
+Then add the widget to your panel: Right-click panel → Add Widgets → Search "AsusCtrl"
 
 ---
 
@@ -205,7 +205,7 @@ If you prefer manual installation or the automatic script doesn't work for your 
 
 1. Right-click on your KDE Plasma panel
 2. Select "Add Widgets..."
-3. Search for "ASUS TUF Control"
+3. Search for "AsusCtrl"
 4. Drag the widget to your panel or desktop
 
 **Note:** If the widget doesn't appear immediately after installation:

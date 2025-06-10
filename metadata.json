@@ -15,7 +15,7 @@
         "Icon": "laptop",
         "Id": "org.kde.plasma.asustufcontrol",
         "License": "GPL-2.0+",
-        "Name": "ASUS TUF Control",
+        "Name": "AsusCtrl",
         "Version": "1.2.0",
         "Website": ""
     },

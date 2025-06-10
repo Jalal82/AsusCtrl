@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# ASUS TUF Control - KDE Plasma Widget Uninstallation Script
-# This script removes the ASUS TUF Control widget and its configuration
+# AsusCtrl - KDE Plasma Widget Uninstallation Script
+# This script removes the AsusCtrl widget and its configuration
 
 set -e  # Exit on any error
 
@@ -37,7 +37,7 @@ command_exists() {
 # Main uninstallation function
 main() {
     echo "========================================"
-    echo "  ASUS TUF Control Widget Uninstaller"
+    echo "  AsusCtrl Widget Uninstaller"
     echo "========================================"
     echo ""
     
@@ -49,7 +49,7 @@ main() {
     fi
     
     # Ask for confirmation
-    echo "This will remove the ASUS TUF Control widget and its configuration."
+    echo "This will remove the AsusCtrl widget and its configuration."
     echo "System services (asusd, supergfxd) will be left running as they may be used by other applications."
     echo ""
     read -p "Are you sure you want to continue? (y/N): " -n 1 -r
@@ -132,7 +132,7 @@ main() {
     print_success "Uninstallation completed successfully!"
     echo "========================================"
     echo ""
-    print_status "The ASUS TUF Control widget has been removed."
+    print_status "The AsusCtrl widget has been removed."
     
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo ""
