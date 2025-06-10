@@ -11,8 +11,8 @@ A comprehensive KDE Plasma widget for controlling ASUS TUF series laptops, provi
 **TL;DR**: Download and run the install script:
 
 ```bash
-git clone https://github.com/yourusername/asus-tuf-control.git
-cd asus-tuf-control
+git clone https://github.com/Jalal82/AsusCtrl.git
+cd AsusCtrl
 chmod +x install.sh
 ./install.sh
 ```
@@ -56,13 +56,13 @@ The easiest way to install the widget is using the automated install script:
 1. **Download and Extract:**
    ```bash
    # Download the latest release
-   wget https://github.com/yourusername/asus-tuf-control/archive/main.zip
+   wget https://github.com/Jalal82/AsusCtrl/archive/main.zip
    unzip main.zip
-   cd asus-tuf-control-main
+   cd AsusCtrl-main
    
    # Or clone the repository
-   git clone https://github.com/yourusername/asus-tuf-control.git
-   cd asus-tuf-control
+   git clone https://github.com/Jalal82/AsusCtrl.git
+   cd AsusCtrl
    ```
 
 2. **Run the Install Script:**
@@ -128,8 +128,8 @@ If you prefer manual installation or the automatic script doesn't work for your 
 
 1. **Download the Widget:**
    ```bash
-   git clone https://github.com/yourusername/asus-tuf-control.git
-   cd asus-tuf-control
+   git clone https://github.com/Jalal82/AsusCtrl.git
+   cd AsusCtrl
    ```
 
 2. **Install to User Directory:**
@@ -411,8 +411,8 @@ python3 /path/to/helper.py status
 ### Development Setup
 ```bash
 # Clone for development
-git clone https://github.com/yourusername/asus-tuf-control.git
-cd asus-tuf-control
+git clone https://github.com/Jalal82/AsusCtrl.git
+cd AsusCtrl
 
 # Install in development mode (symlink)
 ln -s $(pwd)/org.kde.plasma.asustufcontrol ~/.local/share/plasma/plasmoids/
