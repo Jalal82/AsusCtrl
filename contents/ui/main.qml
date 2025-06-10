@@ -1976,7 +1976,7 @@ PlasmoidItem {
                     spacing: Kirigami.Units.smallSpacing
 
                     Image {
-                        source: Qt.resolvedUrl("../icons/icons8-speed-50 (1).png")
+                        source: Qt.resolvedUrl("../icons/icons8-laptop-48.png")
                         sourceSize.width: 25
                         sourceSize.height: 25
                     }
