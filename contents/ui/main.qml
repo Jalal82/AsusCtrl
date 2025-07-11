@@ -109,6 +109,27 @@ PlasmoidItem {
     property bool pendingUIRevert: false
     property var revertTimer: null
 
+    // Handle widget expand/collapse to optimize CPU usage
+    onExpandedChanged: {
+        log("Widget expanded state changed to: " + expanded);
+        
+        if (expanded) {
+            // Widget is being opened - start status updates
+            log("Widget expanded, starting status updates");
+            if (statusUpdateTimer && !statusUpdateTimer.running) {
+                statusUpdateTimer.start();
+                // Also trigger an immediate status update when opening
+                Qt.callLater(updateStatus);
+            }
+        } else {
+            // Widget is being minimized - stop status updates to save CPU
+            log("Widget collapsed, stopping status updates to save CPU");
+            if (statusUpdateTimer && statusUpdateTimer.running) {
+                statusUpdateTimer.stop();
+            }
+        }
+    }
+
     // Add this helper function before the DataSource
     function cleanStatusValue(line) {
         // Extract everything after the colon and trim
@@ -687,13 +708,16 @@ PlasmoidItem {
                 import QtQuick 2.0
                 Timer {
                     interval: 3000  // Optimized to 3 seconds for better responsiveness vs performance
-                    running: false  // Start manually after initial system status is loaded
+                    running: false  // Will be started only when widget is expanded
                     repeat: true
                     onTriggered: {
-                        root.updateStatus();
-                        // Also check for auto display mode changes periodically
-                        if (root.autoDisplayMode) {
-                            root.checkAutoDisplayModeChange();
+                        // Only update status if widget is expanded to save CPU
+                        if (root.expanded) {
+                            root.updateStatus();
+                            // Also check for auto display mode changes periodically
+                            if (root.autoDisplayMode) {
+                                root.checkAutoDisplayModeChange();
+                            }
                         }
                     }
                 }
@@ -764,24 +788,31 @@ PlasmoidItem {
                                 break;
                             case 4:
                                 // Step 4: Read supported refresh rates and finalize startup
-                                log("Startup Step 4: Reading supported refresh rates and starting regular updates");
+                                log("Startup Step 4: Reading supported refresh rates and finalizing startup");
                                 statusSource.connectSource("/usr/bin/python3 " + root.scriptPath + " get-supported-rates");
                                 
-                                // Start regular status updates now that initial state is loaded
-                                if (statusUpdateTimer) {
+                                // Only start regular status updates if widget is expanded to save CPU
+                                if (statusUpdateTimer && root.expanded) {
                                     statusUpdateTimer.start();
-                                    log("Regular status updates started after initial system state loaded");
+                                    log("Regular status updates started (widget is expanded)");
+                                } else {
+                                    log("Widget is collapsed, status updates will start when expanded");
                                 }
+                                
+                                // Mark initial startup as complete
+                                root.isInitialStartup = false;
                                 
                                 destroy(); // Clean up startup timer
                                 break;
                         }
                     } catch (error) {
                         console.error("Error in startup sequence step " + step + ":", error);
-                        // Start regular updates even if startup fails
-                        if (statusUpdateTimer && !statusUpdateTimer.running) {
+                        // Only start regular updates if widget is expanded
+                        if (statusUpdateTimer && !statusUpdateTimer.running && root.expanded) {
                             statusUpdateTimer.start();
                         }
+                        // Mark startup as complete even if it failed
+                        root.isInitialStartup = false;
                         destroy();
                     }
                 }
@@ -1360,7 +1391,7 @@ PlasmoidItem {
                         // Schedule status update after successful command for confirmation
                         if (commandSucceeded) {
                             log("Scheduling status update after successful command");
-                            if (statusUpdateTimer) {
+                            if (statusUpdateTimer && root.expanded) {
                                 statusUpdateTimer.restart();
                             }
                         }
@@ -1523,9 +1554,9 @@ PlasmoidItem {
         Layout.preferredHeight: mainColumnLayout.implicitHeight + Kirigami.Units.largeSpacing * 2 // Calculate height dynamically
         // Refresh status when expanded
         Component.onCompleted: {
-            if (statusUpdateTimer) {
-                statusUpdateTimer.restart();
-            }
+            // Status updates are now handled by the onExpandedChanged handler
+            // This ensures we don't duplicate timer starts
+            log("Full representation loaded");
         }
 
         // Use Item to contain the layout
@@ -2184,9 +2215,9 @@ PlasmoidItem {
             log("Error clearing connected sources: " + error);
         }
         
-        // Restart timers after a delay
+        // Restart timers after a delay - only if widget is expanded
         Qt.callLater(function() {
-            if (statusUpdateTimer)
+            if (statusUpdateTimer && root.expanded)
                 statusUpdateTimer.start();
             log("Emergency reset completed");
         });
@@ -2243,8 +2274,8 @@ PlasmoidItem {
             var testAccess = currentPowerProfile;
             if (!testAccess && testAccess !== "") {
                 log("Health check: Widget may be unresponsive, performing light reset");
-                // Gentle reset without full emergency
-                if (statusUpdateTimer) {
+                // Gentle reset without full emergency - only if widget is expanded
+                if (statusUpdateTimer && root.expanded) {
                     statusUpdateTimer.restart();
                 }
             }
