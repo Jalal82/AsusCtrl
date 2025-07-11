@@ -20,19 +20,20 @@ A comprehensive KDE Plasma widget for controlling ASUS TUF series laptops, provi
 
 ### Advanced Hardware Controls
 ![Advanced Controls](git_imgs/cpu_control.png)
+
 *Advanced controls window with CPU power limits, keyboard lighting, and detailed settings*
 
 
 ### Keyboard Lighting
 ![RGB Controls](git_imgs/aura.png)
 
-*Full keyboard lighting control with modes and bios settings*
+*Keyboard lighting control with modes and bios settings*
 
 
 
 ## 🚀 Quick Setup
 
-**TL;DR**: Download and run the install script:
+** Download and run the install script:
 
 ```bash
 git clone https://github.com/Jalal82/AsusCtrl.git
@@ -59,7 +60,6 @@ Then add the widget to your panel: Right-click panel → Add Widgets → Search 
   - Multiple lighting modes (Static, Breathing, Fast)
   - Per-state power control (Boot, Awake, Sleep, Shutdown)
   - Brightness adjustment (0-3 levels)
-  - Custom RGB color settings
 - **Display Settings**: Panel overdrive toggle and refresh rate control
 - **Auto Display Mode**: Automatic display optimization based on power status
 - **System Monitoring**: Real-time CPU/GPU temperatures and fan speeds
@@ -291,14 +291,10 @@ sudo udevadm control --reload-rules
 
 | Power Mode | GPU Mode | Panel Icon | Description |
 |------------|----------|------------|-------------|
-| Silent | Integrated | ![iGPU Icon](screenshots/icons/egpu-mode.png) | Power-saving mode with integrated graphics |
-| Balanced | Hybrid | ![Hybrid Icon](screenshots/icons/hgpu-mode.png) | Balanced performance with hybrid graphics |
-| Performance | Dedicated | ![dGPU Icon](screenshots/icons/dgpu-mode.png) | Maximum performance with dedicated GPU |
+| Silent | Integrated | ![iGPU Icon](contents/icons/egpu_mode.png) | Power-saving mode with integrated graphics |
+| Balanced | Hybrid | ![Hybrid Icon](contents/icons/hgpu_mode.png) | Balanced performance with hybrid graphics |
+| Performance | Dedicated | ![dGPU Icon](contents/icons/dgpu_mode.png) | Maximum performance with dedicated GPU |
 
-### Advanced Controls Layout
-
-![Advanced Layout](screenshots/advanced-layout-diagram.png)
-*Advanced controls window layout showing all available hardware controls*
 
 ## 🎮 Usage
 
@@ -311,9 +307,10 @@ sudo udevadm control --reload-rules
 
 ### Widget Behavior
 - **Panel Icon**: Dynamically changes to show current GPU mode
-  - 🔋 Green icon = Integrated GPU (power saving)
-  - ⚡ Yellow icon = Hybrid mode (balanced)
-  - 🎮 Red icon = Dedicated GPU (performance)
+  - <img src="contents/icons/icons8-organic-food-50.png" width="30" title="iGPU Icon">   Integrated GPU (power saving)
+  - <img src="contents/icons/icons8-affinity-photo-50.png" width="30" title="hGPU Icon">   Hybrid mode (balanced)
+  - <img src="contents/icons/icons8-game-controller-64.png" width="30" title="dGPU Icon">   Dedicated GPU (performance)
+  - 
 - **Visual Feedback**: Buttons highlight when active, disable when unavailable
 - **Status Updates**: Real-time updates every 3 seconds, immediate on changes
 
@@ -332,7 +329,6 @@ Access via the "Advanced HW Controls" button for:
   - Breathing (mode 1) 
   - Fast pulse (mode 10)
 - **Power States**: Configure lighting for Boot/Awake/Sleep/Shutdown
-- **RGB Colors**: Custom color selection (if supported)
 
 #### Display Settings
 - **Panel Overdrive**: Toggle high refresh rate display overdrive
@@ -374,19 +370,17 @@ python3 ~/.local/share/plasma/plasmoids/org.kde.plasma.asustufcontrol/contents/s
 | **Battery** | ASUS charge limit support | Required for battery management |
 
 ### Kernel Compatibility
-- **Standard Linux kernels** (5.15+)
-- **Gaming kernels** (linux-zen, linux-gaming)
-- **Bore kernel** (CachyOS) - Tested and verified
-- **Custom kernels** with ASUS laptop support
+- **CachyOS kernel** (bore) - Tested and verified
+- **Custom kernels** with ASUS laptop asusd / wmi support support
 
 ### CPU Support
 - **Intel**: Core i5/i7/i9 with RAPL power controls
-- **AMD**: Ryzen 5/7/9 with ryzenadj support
+- **AMD**: Ryzen 5/7/9 with ryzenadj support (to be tested)
 
 ### GPU Support
 - **NVIDIA**: GTX/RTX series with MUX switch support
-- **AMD**: RX series with hybrid graphics
-- **Intel**: Integrated graphics (Intel Arc support)
+- **AMD**: RX series with hybrid graphics (to be tested)
+- **Intel**: Integrated graphics 
 
 ## 🤝 Contributing
 
